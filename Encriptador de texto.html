@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encriptador</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<!-- El atributo onload nos permitirá llamar a la función changeListener al momento de cargar la página y con ello permitir el correcto funcionamiento de dicha función -->
+<body onload="changeListener()">
+
+    <header>
+        <h1>Encriptador/Desencriptador de texto</h1>
+    </header>
+
+    <main>
+        <form>
+
+            <fieldset>
+                <!-- El atributo autocomplete nos permitirá desactivar la opción para que se mantenga la última opción seleccionada -->
+                <!-- A su vez, el atributo onchange nos permitirá llamar a nuestra función cada que cambiemos la opción --> 
+                <select class="selector" autocomplete="off" onchange="changeListener()">
+                    <option value="encriptar" selected="selected">Encriptador</option>
+                    <option value="desencriptar">Desencriptador</option>
+                </select>
+            </fieldset>
+
+            <fieldset>
+                <!-- Se asigna un atributo onkeypress al textarea donde escribiremos el mensaje a encriptar o desencriptar -->
+                <!-- Esto hará que, en el instante en que ingresemos un valor, llame a la función check para revisar el contenido que ingresamos -->
+                <textarea id="mensaje" cols="80" rows="20" class="input-padron" required placeholder="Mensaje a encriptar" onkeypress="return check(event)"></textarea>
+                <textarea id="mensaje2" cols="80" rows="20" class="input-padron" readonly placeholder="Mensaje encriptado"></textarea>
+            </fieldset>
+
+            <fieldset id="frameBotones">
+                <button id="enviar" type="button" class="selector">Convertir</button>
+                <button id="copiar" type="button" class="selector">Copiar texto</button>
+            </fieldset>
+
+        </form>
+    </main>
+
+    <script>
+
+        let btnEnviar = document.querySelector("button");
+        let btnSelector = document.querySelector("select");
+        let messageConversor = document.getElementById("mensaje");
+        let messageConverted = document.getElementById("mensaje2");
+        let copyMessage = document.getElementById("copiar");
+
+        // La función check revisa las letras ingresadas. Con ella aplicaremos un filtro para evitar mayúsculas y carácteres especiales
+        function check(e){
+            // Recibimos todas las teclas
+            tecla = (document.all) ? e.keyCode : e.which;
+            // En caso de ser la tecla para eliminar permitiremos que sea utilizada
+            if (tecla == 8) {
+                return true;
+            }
+            // En caso de ser otra tecla la compararemos con una expresión regular para saber si es un caracter especial o una mayúscula
+            patron = /[a-z0-9]/;
+            tecla_final = String.fromCharCode(tecla);
+            return patron.test(tecla_final);
+        }
+        
+        // La función changePlaceHolder cambiará el placeholder de los textarea dependiendo de la opción que se vaya a utilizar (encriptar o desencriptar)
+        function changePlaceHolder(){
+            btnSelector.addEventListener('change', function(){
+                if (btnSelector.value == "encriptar"){
+                    messageConversor.setAttribute("placeholder", "Mensaje a encriptar");
+                    messageConverted.setAttribute("placeholder", "Mensaje encriptado");           
+                }
+                else{
+                    messageConversor.placeholder = "Mensaje encriptado";
+                    messageConverted.placeholder = "Mensaje desencriptado";
+                }
+            });
+        }
+
+        // La función encriptarMensaje se encarga de recibir lo que ingresamos en el textarea y cifra el mensaje utilizando un diccionario con los valores indicados para cada vocal
+        function encriptarMensaje(){
+            let dict = {a:"ai" , e:"enter" , i:"imes", o:"ober", u:"ufat"}
+            let mensaje = messageConversor.value;
+            let mensaje_en = "";
+            let iterador = 0;
+            while(iterador < mensaje.length){
+                if (mensaje.charAt(iterador) in dict){
+                    if(mensaje[iterador] == "a")
+                    mensaje_en += dict.a
+                    else if(mensaje[iterador] == "e")
+                    mensaje_en += dict.e
+                    else if(mensaje[iterador] == "i")
+                    mensaje_en += dict.i
+                    else if(mensaje[iterador] == "o")
+                    mensaje_en += dict.o
+                    else if(mensaje[iterador] == "u")
+                    mensaje_en += dict.u
+                    iterador += 1
+                }
+                else{
+                    mensaje_en += mensaje[iterador]
+                    iterador += 1
+                }
+            }
+            messageConverted.innerHTML = mensaje_en;
+        }
+
+        // La función desencriptarMensaje se encargará de recibir lo que ingresemos en el textarea y desencriptarlo utilizando un diccionario con los valores indicados para cada vocal
+        function desencriptarMensaje(){
+            let dict = {a:"ai" , e:"enter" , i:"imes", o:"ober", u:"ufat"};
+            let mensaje = messageConversor.value;
+            let mensaje_des = "";
+            let mensaje_en = "";
+            let iterador = 0;
+            while(iterador < mensaje.length){
+                if (mensaje.charAt(iterador) in dict){
+                    mensaje_des += mensaje[iterador];
+                    if((mensaje[iterador] == "i") || (mensaje[iterador] == "o") || (mensaje[iterador] == "u")){
+                        iterador += 4;
+                    }
+                    else if((mensaje[iterador] == "e")){
+                        iterador += 5
+                    }
+                    else{
+                        iterador += 2
+                    }
+                }
+                else{
+                    mensaje_des += (mensaje[iterador]);
+                    iterador += 1;
+                }
+            }
+            messageConverted.innerHTML = mensaje_des;
+        }
+        
+        // La función changeListener se encargará de limpiar el texto de los textarea si se cambia de opción y nos ayudará a llamar a la función adecuada dependiendo de la opción seleccionada
+        function changeListener(){
+            messageConversor.value = '';
+            messageConverted.innerHTML = '';
+            if(btnSelector.value == "encriptar"){
+                btnEnviar.onclick = encriptarMensaje;
+            }
+            else{
+                btnEnviar.onclick = desencriptarMensaje
+            }
+        }
+
+        changePlaceHolder();
+        copyMessage.onclick = function(){
+            messageConverted.select();
+            document.execCommand('copy');
+        }
+    </script>
+
+    <footer>
+        <h3>Creado por Abraham Israel López Eguiarte</h3>
+    </footer>
+</body>
+</html>
