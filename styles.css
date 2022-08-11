@@ -1,3 +1,7 @@
+*:not(.notAll){
+    min-width: 300px;
+}
+
 body{
     background: #495057;
 }
@@ -17,7 +21,6 @@ h1{
 }
 
 img{
-    min-width: none;
     width: 50px;
 }
 
